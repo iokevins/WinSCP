@@ -86,7 +86,7 @@
                     Sort-Object -Property IsDirectory -Descending:$false | 
                         Sort-Object -Property @{ Expression = { Split-Path -Path $_.FullName } }, Name
 
-                if ($PSBoundParameters.ContainsKey("Depth")) {
+                if ($parameterDepthExists) {
                     $items = $items | 
                         Where-Object {
                             ($_.FullName.SubString(
