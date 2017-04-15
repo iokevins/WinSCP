@@ -1,12 +1,13 @@
-﻿Function ConvertTo-WinSCPEscapedString {
+﻿function ConvertTo-WinSCPEscapedString {
+    
     [CmdletBinding(
-        HelpUri = 'https://github.com/dotps1/WinSCP/wiki/ConvertTo-WinSCPEscapedString'
+        HelpUri = "http://dotps1.github.io/WinSCP/ConvertTo-WinSCPEscapedString.html"
     )]
     [OutputType(
         [String]
     )]
 
-    Param (
+    param (
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true,
@@ -16,21 +17,26 @@
         $FileMask
     )
 
-    Begin {
+    begin {
         $sessionObject = New-Object -TypeName WinSCP.Session
     }
 
-    Process {
-        foreach ($item in $FileMask) {
+    process {
+        foreach ($fileMaskValue in $FileMask) {
             try {
-                $sessionObject.EscapeFileMask($item)
+                $output = $sessionObject.EscapeFileMask(
+                    $fileMaskValue
+                )
+
+                Write-Output -InputObject $output
             } catch {
                 Write-Error -Message $_.ToString()
+                continue
             }
         }
     }
     
-    End {
+    end {
         $sessionObject.Dispose()
     }
 }
