@@ -1,13 +1,14 @@
-﻿Function New-WinSCPItem {
+﻿function New-WinSCPItem {
+
     [CmdletBinding(
         SupportsShouldProcess = $true,
-        HelpUri = 'https://github.com/dotps1/WinSCP/wiki/New-WinSCPItem'
+        HelpUri = "http://dotps1.github.io/WinSCP/New-WinSCPItem.html"
     )]
     [OutputType(
         [WinSCP.RemoteFileInfo]
     )]
     
-    Param (
+    param (
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true
@@ -16,7 +17,7 @@
             if ($_.Opened) { 
                 return $true 
             } else { 
-                throw 'The WinSCP Session is not in an Open state.'
+                throw "The WinSCP Session is not in an Open state."
             }
         })]
         [WinSCP.Session]
@@ -26,7 +27,7 @@
             ValueFromPipelineByPropertyName = $true
         )]
         [String[]]
-        $Path = '/',
+        $Path = "/",
 
         [Parameter(
             ValueFromPipelineByPropertyName = $true
@@ -36,7 +37,7 @@
 
         [Parameter()]
         [String]
-        $ItemType = 'File',
+        $ItemType = "File",
 
         [Parameter()]
         [String]
@@ -51,45 +52,52 @@
         $TransferOptions = (New-Object -TypeName WinSCP.TransferOptions)
     )
 
-    Begin {
-        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey('WinSCPSession')
+    begin {
+        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey(
+            "WinSCPSession"
+        )
     }
 
-    Process {
-        foreach ($item in (Format-WinSCPPathString -Path $($Path))) {
-            if ($PSBoundParameters.ContainsKey('Name')) {
-                $item = Format-WinSCPPathString -Path $(Join-Path -Path $item -ChildPath $Name)
+    process {
+        foreach ($pathValue in (Format-WinSCPPathString -Path $($Path))) {
+            $parameterNameExists = $PSBoundParameters.ContainsKey(
+                "Name"
+            )
+            if ($parameterNameExists) {
+                $pathValue = Format-WinSCPPathString -Path $(Join-Path -Path $pathValue -ChildPath $Name)
             }
 
-            if (-not (Test-WinSCPPath -WinSCPSession $WinSCPSession -Path (Split-Path -Path $item -Parent))) {
-                Write-Error -Message "Could not find a part of the path '$item'"
-
+            if (-not (Test-WinSCPPath -WinSCPSession $WinSCPSession -Path (Split-Path -Path $pathValue -Parent))) {
+                Write-Error -Message "Could not find a part of the path '$pathValue'."
                 continue
             }
 
-            if ((Test-WinSCPPath -WinSCPSession $WinSCPSession -Path $item) -and -not $Force.IsPresent) {
-                Write-Error -Message "An item with the spcified name '$item' already exists."
-
+            if ((Test-WinSCPPath -WinSCPSession $WinSCPSession -Path $pathValue) -and -not $Force.IsPresent) {
+                Write-Error -Message "An item with the spcified name '$pathValue' already exists."
                 continue
             } 
 
             try {
                 $newItemParams = @{
                     Path = $env:TEMP
-                    Name = (Split-Path -Path $item -Leaf)
+                    Name = (Split-Path -Path $pathValue -Leaf)
                     ItemType = $ItemType
                     Value = $Value
                     Force = $true
                 }
 
-                if ($PSCmdlet.ShouldProcess($item)) {
-                    $result = $WinSCPSession.PutFiles((New-Item @newItemParams).FullName, $item, $true, $TransferOptions)
+                $shouldProcess = $PSCmdlet.ShouldProcess(
+                    $pathValue
+                )
+                if ($shouldProcess) {
+                    $result = $WinSCPSession.PutFiles(
+                        (New-Item @newItemParams).FullName, $pathValue, $true, $TransferOptions
+                    )
 
                     if ($result.IsSuccess) {
-                        Get-WinSCPItem -WinSCPSession $WinSCPSession -Path $item
+                        Get-WinSCPItem -WinSCPSession $WinSCPSession -Path $pathValue
                     } else {
                         Write-Error $result.Check()
-
                         continue
                     }
                 }
@@ -99,7 +107,7 @@
         }
     }
 
-    End {
+    end {
         if (-not ($sessionValueFromPipeLine)) {
             Remove-WinSCPSession -WinSCPSession $WinSCPSession
         }

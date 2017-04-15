@@ -1,12 +1,13 @@
-﻿Function Move-WinSCPItem {
+﻿function Move-WinSCPItem {
+
     [CmdletBinding(
-        HelpUri = 'https://github.com/dotps1/WinSCP/wiki/Move-WinSCPItem'
+        HelpUri = "http://dotps1.github.io/WinSCP/Move-WinSCPItem.html"
     )]
     [OutputType(
         [Void]
     )]
     
-    Param (
+    param (
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true
@@ -15,7 +16,7 @@
             if ($_.Opened) { 
                 return $true 
             } else { 
-                throw 'The WinSCP Session is not in an Open state.'
+                throw "The WinSCP Session is not in an Open state."
             }
         })]
         [WinSCP.Session]
@@ -30,7 +31,7 @@
 
         [Parameter()]
         [String]
-        $Destination = '/',
+        $Destination = "/",
 
         [Parameter()]
         [Switch]
@@ -41,41 +42,51 @@
         $PassThru
     )
 
-    Begin {
-        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey('WinSCPSession')
+    begin {
+        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey(
+            "WinSCPSession"
+        )
     }
 
-    Process {
+    process {
         if (-not (Test-WinSCPPath -WinSCPSession $WinSCPSession -Path ($Destination = Format-WinSCPPathString -Path $($Destination)))) {
             if ($Force.IsPresent) {
                 New-WinSCPItem -WinSCPSession $WinSCPSession -Path $Destination -ItemType Directory
             } else {
-                Write-Error -Message 'Could not find a part of the path.'
-
+                Write-Error -Message "Could not find a part of the path."
                 return
             }
         }
 
-        foreach ($item in (Format-WinSCPPathString -Path $($Path))) {
+        foreach ($pathValue in (Format-WinSCPPathString -Path $($Path))) {
             try {
-                if (-not ($Destination.EndsWith($item))) {
-                    if (-not ($Destination.EndsWith('/'))) {
-                        $Destination += '/'
-                    }
+                $destinationEndsWithPathValue = $Destination.EndsWith(
+                    $pathValue
+                )
+                $destinationEndsWithBackSlash = $Destination.EndsWith(
+                    "/"
+                )
+                if (-not $destinationEndsWithPathValue -and -not $destinationEndsWithBackSlash) {
+                    $Destination += "/"
                 }
 
-                $WinSCPSession.MoveFile($item.TrimEnd('/'), $Destination)
+                $WinSCPSession.MoveFile(
+                    $pathValue.TrimEnd(
+                        "/"
+                    ), $Destination
+                )
 
                 if ($PassThru.IsPresent) {
                     Get-WinSCPItem -WinSCPSession $WinSCPSession -Path (Join-Path -Path $Destination -ChildPath (Split-Path -Path $item -Leaf))
                 }
             } catch {
                 Write-Error -Message $_.ToString()
+                continue
             }
         }
     }
 
-    End {
+    end {
         if (-not ($sessionValueFromPipeLine)) {
             Remove-WinSCPSession -WinSCPSession $WinSCPSession
         }

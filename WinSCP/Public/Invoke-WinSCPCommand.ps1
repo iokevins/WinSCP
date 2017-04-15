@@ -1,12 +1,13 @@
-﻿Function Invoke-WinSCPCommand {
+﻿function Invoke-WinSCPCommand {
+
     [CmdletBinding(
-        HelpUri = 'https://github.com/dotps1/WinSCP/wiki/Invoke-WinSCPCommand'
+        HelpUri = "http://dotps1.github.io/WinSCP/Invoke-WinSCPCommand.html"
     )]
     [OutputType(
         [WinSCP.CommandExecutionResult]
     )]
 
-    Param (
+    param (
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true
@@ -15,7 +16,7 @@
             if ($_.Opened) { 
                 return $true 
             } else { 
-                throw 'The WinSCP Session is not in an Open state.'
+                throw "The WinSCP Session is not in an Open state."
             }
         })]
         [WinSCP.Session]
@@ -29,21 +30,28 @@
         $Command
     )
 
-    Begin {
-        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey('WinSCPSession')
+    begin {
+        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey(
+            "WinSCPSession"
+        )
     }
 
-    Process {
-        foreach ($commandment in $Command) {
+    process {
+        foreach ($commandValue in $Command) {
             try {
-                $WinSCPSession.ExecuteCommand($commandment)
+                $output = $WinSCPSession.ExecuteCommand(
+                    $commandValue
+                )
+
+                Write-Output -InputObject $output
             } catch {
                 Write-Error -Message $_.ToString()
+                continue
             }
         }
     }
 
-    End {
+    end {
         if (-not ($sessionValueFromPipeLine)) {
             Remove-WinSCPSession -WinSCPSession $WinSCPSession
         }

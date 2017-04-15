@@ -84,7 +84,7 @@
                     $pathValue, $Filter, $enumerationOptions
                 ) | 
                     Sort-Object -Property IsDirectory -Descending:$false | 
-                        Sort-Object -Property @{ Expression = { Split-Path $_.FullName } }, Name
+                        Sort-Object -Property @{ Expression = { Split-Path -Path $_.FullName } }, Name
 
                 if ($PSBoundParameters.ContainsKey("Depth")) {
                     $items = $items | 
