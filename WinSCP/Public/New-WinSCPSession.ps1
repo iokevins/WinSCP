@@ -143,7 +143,7 @@
         "SshPrivateKeyPath"
     )
     if ($parameterSshPrivateKeyPathExist) {
-        $PSBoundParameters.SshPrivateKeyPath = $SshPrivateKeyPath
+        $PSBoundParameters.SshPrivateKeyPath = (Resolve-Path -Path $SshPrivateKeyPath).Path
     }
 
     # Convert SshPrivateKeySecurePasspahrase to plain text and set it to the corresponding SessionOptions property.

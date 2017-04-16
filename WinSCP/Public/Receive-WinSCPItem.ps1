@@ -1,12 +1,13 @@
-﻿Function Receive-WinSCPItem {
+﻿function Receive-WinSCPItem {
+    
     [CmdletBinding(
-        HelpUri = 'https://github.com/dotps1/WinSCP/wiki/Receive-WinSCPItem'
+        HelpUri = "http://dotps1.github.io/WinSCP/Receive-WinSCPItem.html"
     )]
     [OutputType(
         [WinSCP.TransferOperationResult]
     )]
 
-    Param (
+    param (
             [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true
@@ -15,7 +16,7 @@
             if ($_.Opened) { 
                 return $true 
             } else { 
-                throw 'The WinSCP Session is not in an Open state.'
+                throw "The WinSCP Session is not in an Open state."
             }
         })]
         [WinSCP.Session]
@@ -38,24 +39,27 @@
 
         [Parameter()]
         [WinSCP.TransferOptions]
-        $TransferOptions = (
-            New-Object -TypeName WinSCP.TransferOptions
-        )
+        $TransferOptions = (New-Object -TypeName WinSCP.TransferOptions)
     )
 
-    Begin {
-        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey('WinSCPSession')
+    begin {
+        $sessionValueFromPipeLine = $PSBoundParameters.ContainsKey(
+            "WinSCPSession"
+        )
 
-        if ((Get-Item -Path $Destination -ErrorAction SilentlyContinue).PSIsContainer -and -not $Destination.EndsWith('\')) {
-            $Destination = "$Destination\"
+        $destinationEndsWithSlash = $Destination.EndsWith(
+            [System.IO.Path]::DirectorySeparatorChar
+        )
+        if ((Get-Item -Path $Destination -ErrorAction SilentlyContinue).PSIsContainer -and -not $destinationEndsWithSlash) {
+            $Destination += "\"
         }
     }
 
-    Process {
-        foreach ($item in (Format-WinSCPPathString -Path $($Path))) {
+    process {
+        foreach ($pathValue in (Format-WinSCPPathString -Path $($Path))) {
             try {
                 $result = $WinSCPSession.GetFiles(
-                    $item, $Destination, $Remove.IsPresent, $TransferOptions
+                    $pathValue, $Destination, $Remove.IsPresent, $TransferOptions
                 )
 
                 if ($result.IsSuccess) {
@@ -66,11 +70,12 @@
                 }
             } catch {
                 Write-Error -Message $_.ToString()
+                continue
             }
         }
     }
 
-    End {
+    end {
         if (-not ($sessionValueFromPipeLine)) {
             Remove-WinSCPSession -WinSCPSession $WinSCPSession
         }

@@ -63,10 +63,10 @@
                 $destinationEndsWithPathValue = $Destination.EndsWith(
                     $pathValue
                 )
-                $destinationEndsWithBackSlash = $Destination.EndsWith(
+                $destinationEndsWithSlash = $Destination.EndsWith(
                     "/"
                 )
-                if (-not $destinationEndsWithPathValue -and -not $destinationEndsWithBackSlash) {
+                if (-not $destinationEndsWithPathValue -and -not $destinationEndsWithSlash) {
                     $Destination += "/"
                 }
 
