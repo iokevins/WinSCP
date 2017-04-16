@@ -24,7 +24,7 @@ Author = "Thomas J. Malkewitz @dotps1"
 # CompanyName = "Unknown"
 
 # Copyright statement for this module
-Copyright = "(c) 2015 Thomas J. Malkewitz @dotps1. All rights reserved.  Licensed with GNU GENERAL PUBLIC LICENSE."
+Copyright = "(c) 2017 Thomas J. Malkewitz @dotps1. All rights reserved.  Licensed with GNU GENERAL PUBLIC LICENSE."
 
 # Description of the functionality provided by this module
 Description = "PowerShell Module Wrapper for WinSCP."
@@ -80,6 +80,7 @@ FunctionsToExport = "ConvertTo-WinSCPEscapedString",
     "New-WinSCPItemPermission",
     "New-WinSCPSession",
     "New-WinSCPTransferOption",
+    "New-WinSCPTransferResumeSupport",
     "Receive-WinSCPItem",
     "Remove-WinSCPItem",
     "Remove-WinSCPSession",
@@ -124,6 +125,7 @@ FileList = @(
     "Public\New-WinSCPItemPermission.ps1"
     "Public\New-WinSCPItem.ps1",
     "Public\New-WinSCPTransferOption.ps1",
+    "Public\New-WinSCPTransferResumeSupport.ps1"
     "Public\New-WinSCPSession.ps1",
     "Public\Receive-WinSCPItem.ps1",
     "Public\Remove-WinSCPItem.ps1",
@@ -144,6 +146,7 @@ PrivateData = @{
         # Tags applied to this module. These help with module discovery in online galleries.
         Tags = @(
             "Ftp"
+            "Scp"
             "Sftp"
             "WinSCP"
         )
